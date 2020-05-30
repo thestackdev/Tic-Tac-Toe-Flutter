@@ -417,5 +417,9 @@ class _GamePageState extends State<GamePage> {
     } else if (string == bot) {
       botPoints++;
     }
+    
+  }
+  test() {
+    
   }
 }

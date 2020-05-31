@@ -62,7 +62,9 @@ class HomePage extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30)),
                   child: FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      
+                    },
                     child: Text(
                       'Multi Player',
                       style: TextStyle(

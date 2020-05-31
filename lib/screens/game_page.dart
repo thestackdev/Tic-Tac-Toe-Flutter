@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/AI/ai.dart';
+import 'package:tic_tac_toe/logics/winner.dart';
 import 'package:tic_tac_toe/models/buttons.dart';
 
 class GamePage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _GamePageState extends State<GamePage> {
   String user;
   String bot;
   String btnText;
-  String roundOrGame;
+  String text = '';
 
   @override
   void initState() {
@@ -55,14 +56,14 @@ class _GamePageState extends State<GamePage> {
                     begin: Alignment.topRight,
                     end: Alignment.bottomRight,
                     colors: [
-                  Colors.orange[400],
-                  Colors.orange[700],
                   Colors.orange[900],
+                  Colors.orange[700],
+                  Colors.orange[400],
                 ])),
             child: Column(
               children: <Widget>[
                 SizedBox(
-                  height: 50,
+                  height: 45,
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -84,7 +85,7 @@ class _GamePageState extends State<GamePage> {
                           height: 1.5)),
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -149,7 +150,9 @@ class _GamePageState extends State<GamePage> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
-                          if (winner == null && turn == user) {
+                          if (winner == null &&
+                              turn == user &&
+                              gameButtons[index].isEnabled) {
                             playGame(index);
                           }
                         },
@@ -172,27 +175,14 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.only(top: 15),
-                  child: (winner == null && availabeButtons.length == 0)
-                      ? Text(
-                          'Draw Match',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : (winner != null)
-                          ? Text(
-                              winner != 'draw'
-                                  ? '$winner won the $roundOrGame'
-                                  : 'Draw',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          : Text(''),
-                ),
+                    padding: EdgeInsets.only(top: 15),
+                    child: Text(
+                      text,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold),
+                    )),
               ],
             ),
           ),
@@ -213,18 +203,20 @@ class _GamePageState extends State<GamePage> {
                           availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
                           turn = user;
                           winner = null;
+                          text = '';
                         });
                       } else {
                         setState(() {
                           botPoints = 0;
                           userPoints = 0;
-                          roundsCompleted = 0;
+                          roundsCompleted = 1;
                           userButtons.clear();
                           botButtons.clear();
                           gameButtons.clear();
                           gameButtons = Buttons().getButtons();
                           availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
                           turn = user;
+                          text = '';
                           winner = null;
                         });
                       }
@@ -254,118 +246,18 @@ class _GamePageState extends State<GamePage> {
   }
 
   playGame(int index) {
-    if (gameButtons[index].isEnabled) {
-      setState(() {
-        gameButtons[index].text = user;
-        userButtons.add(index);
-        gameButtons[index].isEnabled = false;
-        checkForWinner(user, index);
+    setState(() {
+      gameButtons[index].text = user;
+      userButtons.add(index);
+      gameButtons[index].isEnabled = false;
+      checkIfGameCompleted(user, index);
+      availabeButtons.remove(index);
+
+      if (winner == null && availabeButtons.length > 0) {
         turn = bot;
-        availabeButtons.remove(index);
-        if (winner == null && availabeButtons.length > 0) {
-          playGameAI(index);
-        }
-      });
-    }
-  }
-
-  checkForWinner(String string, int index) {
-    List<int> checkFor = [];
-    if (string == user) {
-      checkFor = userButtons;
-    } else {
-      checkFor = botButtons;
-    }
-
-    switch (index) {
-      case 0:
-        if (checkFor.contains(1) && checkFor.contains(2) ||
-            checkFor.contains(3) && checkFor.contains(6) ||
-            checkFor.contains(4) && checkFor.contains(8)) {
-          declareForWinner(string);
-          winner = string;
-        }
-        break;
-      case 1:
-        if (checkFor.contains(0) && checkFor.contains(2) ||
-            checkFor.contains(4) && checkFor.contains(7)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-
-        break;
-      case 2:
-        if (checkFor.contains(0) && checkFor.contains(1) ||
-            checkFor.contains(4) && checkFor.contains(6) ||
-            checkFor.contains(5) && checkFor.contains(8)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-
-      case 3:
-        if (checkFor.contains(0) && checkFor.contains(6) ||
-            checkFor.contains(4) && checkFor.contains(5)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-
-      case 4:
-        if (checkFor.contains(1) && checkFor.contains(7) ||
-            checkFor.contains(3) && checkFor.contains(5) ||
-            checkFor.contains(0) && checkFor.contains(8) ||
-            checkFor.contains(2) && checkFor.contains(6)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-
-      case 5:
-        if (checkFor.contains(2) && checkFor.contains(8) ||
-            checkFor.contains(3) && checkFor.contains(4)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-
-      case 6:
-        if (checkFor.contains(0) && checkFor.contains(3) ||
-            checkFor.contains(7) && checkFor.contains(8) ||
-            checkFor.contains(4) && checkFor.contains(2)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-
-      case 7:
-        if (checkFor.contains(1) && checkFor.contains(4) ||
-            checkFor.contains(6) && checkFor.contains(8)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-
-      case 8:
-        if (checkFor.contains(2) && checkFor.contains(5) ||
-            checkFor.contains(6) && checkFor.contains(7) ||
-            checkFor.contains(0) && checkFor.contains(4)) {
-          declareForWinner(string);
-
-          winner = string;
-        }
-        break;
-    }
-    if (availabeButtons.length == 1) {
-      declareForWinner('draw');
-    }
+        playGameAI(index);
+      }
+    });
   }
 
   playGameAI(int index) {
@@ -376,7 +268,6 @@ class _GamePageState extends State<GamePage> {
         gameButtons[getInt].text = bot;
         botButtons.add(getInt);
         gameButtons[getInt].isEnabled = false;
-        checkForWinner(bot, getInt);
         availabeButtons.remove(getInt);
 
         turn = user;
@@ -388,7 +279,7 @@ class _GamePageState extends State<GamePage> {
         gameButtons[i].text = bot;
         botButtons.add(i);
         gameButtons[i].isEnabled = false;
-        checkForWinner(bot, i);
+        checkIfGameCompleted(bot, i);
         availabeButtons.remove(i);
 
         turn = user;
@@ -396,30 +287,42 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
-  void declareForWinner(String string) {
+  checkIfGameCompleted(String who, int index) {
+    if (who == bot) {
+      if (Logics().checkForWinner(index, botButtons)) {
+        botPoints++;
+        text = '$who won the Round';
+        winner = bot;
+      }
+    } else if (who == user) {
+      if (Logics().checkForWinner(index, userButtons)) {
+        userPoints++;
+        text = '$who won the Round';
+        winner = user;
+      }
+    }
+    declareForWinner();
+  }
+
+  void declareForWinner() {
+
     if (roundsCompleted != widget.rounds) {
+      if(availabeButtons.length == 1) {
+        
+      }
       btnText = 'Next Round';
-      roundOrGame = 'Round';
     } else {
       if (botPoints > userPoints) {
         winner = bot;
+        text = '$bot won the Game';
       } else if (botPoints < userPoints) {
         winner = user;
+        text = '$user won the Game';
       } else {
-        winner = 'draw';
+        text = 'Draw Game';
       }
-      btnText = 'Reset Game';
-      roundOrGame = 'Game';
-    }
 
-    if (string == user) {
-      userPoints++;
-    } else if (string == bot) {
-      botPoints++;
+      btnText = 'Reset Game';
     }
-    
-  }
-  test() {
-    
   }
 }

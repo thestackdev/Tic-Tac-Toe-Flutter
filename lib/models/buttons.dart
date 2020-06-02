@@ -7,6 +7,7 @@ class Buttons {
 
   List<Buttons> getButtons() {
     var gameButtons = <Buttons>[
+      new Buttons(id: 0),
       new Buttons(id: 1),
       new Buttons(id: 2),
       new Buttons(id: 3),
@@ -15,7 +16,6 @@ class Buttons {
       new Buttons(id: 6),
       new Buttons(id: 7),
       new Buttons(id: 8),
-      new Buttons(id: 9),
     ];
     return gameButtons;
   }

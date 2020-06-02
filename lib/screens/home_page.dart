@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/screens/item_selection.dart';
+import 'package:tic_tac_toe/screens/online_selection.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -34,17 +35,20 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: 300,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: FlatButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return ItemSelectionPage();
-                      }));
-                    },
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ItemSelectionPage(
+                        page: 'Single Player',
+                      );
+                    }));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30)),
                     child: Text(
                       'Single Player',
                       style: TextStyle(
@@ -57,16 +61,22 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: FlatButton(
-                    onPressed: () {
-                      
-                    },
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ItemSelectionPage(
+                        page: 'Single Player',
+                      );
+                    }));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30)),
                     child: Text(
-                      'Multi Player',
+                      'MultiPlayer',
                       style: TextStyle(
                           color: Colors.orangeAccent,
                           fontSize: 18,
@@ -77,12 +87,18 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: FlatButton(
-                    onPressed: () {},
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return OnlineSelection();
+                    }));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30)),
                     child: Text(
                       'Play Online',
                       style: TextStyle(
@@ -91,7 +107,7 @@ class HomePage extends StatelessWidget {
                           fontWeight: FontWeight.bold),
                     ),
                   ),
-                )
+                ),
               ],
             )),
       ],

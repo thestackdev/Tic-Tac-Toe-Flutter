@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/screens/game_page.dart';
+import 'package:tic_tac_toe/screens/offline_multiplayer.dart';
 
 class ItemSelectionPage extends StatefulWidget {
+  final String page;
+
+  const ItemSelectionPage({Key key, this.page}) : super(key: key);
   @override
   _ItemSelectionPageState createState() => _ItemSelectionPageState();
 }
@@ -152,15 +156,29 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                 right: 0,
                 left: 0,
                 child: GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GamePage(
-                        selectedItem: selected,
-                        rounds: selectedRound,
-                      ),
-                    ),
-                  ),
+                  onTap: () {
+                    if (widget.page == 'SinglePlayer') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GamePage(
+                            selectedItem: selected,
+                            rounds: selectedRound,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OfflineMultiPlayer(
+                            selectedItem: selected,
+                            rounds: selectedRound,
+                          ),
+                        ),
+                      );
+                    }
+                  },
                   child: Container(
                       alignment: Alignment.center,
                       padding: EdgeInsets.all(20),

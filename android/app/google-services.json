@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "970384224606",
+    "firebase_url": "https://tic-tac-toe-by-krishna.firebaseio.com",
+    "project_id": "tic-tac-toe-by-krishna",
+    "storage_bucket": "tic-tac-toe-by-krishna.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970384224606:android:9d2763cd273809aa9cdfcf",
+        "android_client_info": {
+          "package_name": "com.example.tic_tac_toe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970384224606-kidsj962a71uvo9v7pa34nsk0vn96v8g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIsLlgbPM2h1krVK7jg-1anInO_o0uadM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970384224606-kidsj962a71uvo9v7pa34nsk0vn96v8g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

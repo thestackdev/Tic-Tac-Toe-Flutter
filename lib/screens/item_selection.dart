@@ -158,6 +158,7 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                 child: GestureDetector(
                   onTap: () {
                     if (widget.page == 'SinglePlayer') {
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -168,6 +169,7 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                         ),
                       );
                     } else {
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

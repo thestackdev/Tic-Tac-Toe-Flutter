@@ -113,7 +113,6 @@ class _JoinRoomState extends State<JoinRoom> {
                         (BuildContext context, AsyncSnapshot<Event> snapshot) {
                       if (snapshot.hasData) {
                         DataSnapshot _snap = snapshot.data.snapshot;
-
                         if (_snap.value != null) {
                           _database
                               .child(inputData)

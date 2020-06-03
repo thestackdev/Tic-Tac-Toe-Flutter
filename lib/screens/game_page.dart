@@ -14,32 +14,25 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   List<Buttons> gameButtons = [];
-
   List<int> userButtons = [];
   List<int> botButtons = [];
-  int botPoints = 0, userPoints = 0;
-  int roundsCompleted = 1;
+  List<int> availabeButtons = [];
 
-  List<int> availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  int roundsCompleted;
+  int botPoints;
+  int userPoints;
 
   String turn;
   String winner;
   String user;
   String bot;
-  String btnText;
+  String buttonText;
   String text = '';
 
   @override
   void initState() {
-    gameButtons = Buttons().getButtons();
-    if (widget.selectedItem == 'X') {
-      user = 'X';
-      bot = 'O';
-    } else {
-      user = 'O';
-      bot = 'X';
-    }
-    turn = widget.selectedItem;
+    initGame();
+    print('bot game');
     super.initState();
   }
 
@@ -68,21 +61,11 @@ class _GamePageState extends State<GamePage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white70,
-                            Colors.white60,
-                            Colors.white54
-                          ])),
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.orangeAccent[200],
+                  ),
                   child: Text('Round  $roundsCompleted / ${widget.rounds}',
-                      style: TextStyle(
-                          color: Colors.deepOrange,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          height: 1.5)),
+                      style: setTextStyle(25, Colors.white, 1.5)),
                 ),
                 SizedBox(
                   height: 5,
@@ -96,19 +79,11 @@ class _GamePageState extends State<GamePage> {
                           textAlign: TextAlign.center,
                           text: TextSpan(children: <InlineSpan>[
                             TextSpan(
-                              text: 'Player $user\n',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                                text: 'Player $user\n',
+                                style: setTextStyle(25, Colors.white, 1.5)),
                             TextSpan(
                               text: '$userPoints',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.5),
+                              style: setTextStyle(25, Colors.white, 1.5),
                             ),
                           ])),
                     ),
@@ -118,18 +93,11 @@ class _GamePageState extends State<GamePage> {
                           text: TextSpan(children: <InlineSpan>[
                             TextSpan(
                               text: 'Player $bot\n',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold),
+                              style: setTextStyle(25, Colors.white, 1.5),
                             ),
                             TextSpan(
                               text: '$botPoints',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.5),
+                              style: setTextStyle(25, Colors.white, 1.5),
                             ),
                           ])),
                     ),
@@ -178,10 +146,7 @@ class _GamePageState extends State<GamePage> {
                     padding: EdgeInsets.only(top: 15),
                     child: Text(
                       text,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold),
+                      style: setTextStyle(25, Colors.white, 1.5),
                     )),
               ],
             ),
@@ -193,31 +158,25 @@ class _GamePageState extends State<GamePage> {
                   left: 0,
                   child: GestureDetector(
                     onTap: () {
-                      if (btnText == 'Next Round') {
+                      userButtons.clear();
+                      botButtons.clear();
+                      gameButtons.clear();
+                      gameButtons = Buttons().getButtons();
+                      availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+                      turn = user;
+                      winner = null;
+                      text = '';
+
+                      if (buttonText == 'Next Round') {
                         setState(() {
                           roundsCompleted++;
-                          userButtons.clear();
-                          botButtons.clear();
-                          gameButtons.clear();
-                          gameButtons = Buttons().getButtons();
-                          availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-                          turn = user;
-                          winner = null;
-                          text = '';
                         });
                       } else {
                         setState(() {
+                          buttonText = 'Next Round';
                           botPoints = 0;
                           userPoints = 0;
                           roundsCompleted = 1;
-                          userButtons.clear();
-                          botButtons.clear();
-                          gameButtons.clear();
-                          gameButtons = Buttons().getButtons();
-                          availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-                          turn = user;
-                          text = '';
-                          winner = null;
                         });
                       }
                     },
@@ -230,11 +189,8 @@ class _GamePageState extends State<GamePage> {
                       padding: EdgeInsets.all(10),
                       alignment: Alignment.center,
                       child: Text(
-                        btnText.toString(),
-                        style: TextStyle(
-                            color: Colors.deepOrangeAccent,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+                        buttonText,
+                        style: setTextStyle(25, Colors.deepOrangeAccent, 1.5),
                       ),
                     ),
                   ),
@@ -247,11 +203,8 @@ class _GamePageState extends State<GamePage> {
 
   playGame(int index) {
     setState(() {
-      gameButtons[index].text = user;
       userButtons.add(index);
-      gameButtons[index].isEnabled = false;
-      checkIfGameCompleted(user, index);
-      availabeButtons.remove(index);
+      processGame(user, index);
 
       if (winner == null && availabeButtons.length > 0) {
         turn = bot;
@@ -265,23 +218,16 @@ class _GamePageState extends State<GamePage> {
       int getInt = AiTricks().playGameToStart(index);
 
       setState(() {
-        gameButtons[getInt].text = bot;
         botButtons.add(getInt);
-        gameButtons[getInt].isEnabled = false;
-        availabeButtons.remove(getInt);
-
+        processGame(bot, getInt);
         turn = user;
       });
     } else {
-      int i = AiTricks().aiLogic(availabeButtons, userButtons, botButtons);
+      int index = AiTricks().aiLogic(availabeButtons, userButtons, botButtons);
 
       setState(() {
-        gameButtons[i].text = bot;
-        botButtons.add(i);
-        gameButtons[i].isEnabled = false;
-        checkIfGameCompleted(bot, i);
-        availabeButtons.remove(i);
-
+        botButtons.add(index);
+        processGame(bot, index);
         turn = user;
       });
     }
@@ -305,13 +251,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void declareForWinner() {
-
-    if (roundsCompleted != widget.rounds) {
-      if(availabeButtons.length == 1) {
-        
-      }
-      btnText = 'Next Round';
-    } else {
+    if (roundsCompleted == widget.rounds) {
       if (botPoints > userPoints) {
         winner = bot;
         text = '$bot won the Game';
@@ -322,7 +262,42 @@ class _GamePageState extends State<GamePage> {
         text = 'Draw Game';
       }
 
-      btnText = 'Reset Game';
+      buttonText = 'Reset Game';
     }
+  }
+
+  void initGame() {
+    buttonText = 'Next Round';
+    availabeButtons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+    roundsCompleted = 1;
+
+    botPoints = 0;
+    userPoints = 0;
+
+    gameButtons = Buttons().getButtons();
+    if (widget.selectedItem == 'X') {
+      user = 'X';
+      bot = 'O';
+    } else {
+      user = 'O';
+      bot = 'X';
+    }
+    turn = widget.selectedItem;
+  }
+
+  processGame(String text, int index) {
+    gameButtons[index].text = text;
+    gameButtons[index].isEnabled = false;
+    checkIfGameCompleted(text, index);
+    availabeButtons.remove(index);
+  }
+
+  TextStyle setTextStyle(double size, Color color, double height) {
+    return TextStyle(
+        color: color,
+        fontSize: size,
+        fontWeight: FontWeight.bold,
+        height: height);
   }
 }

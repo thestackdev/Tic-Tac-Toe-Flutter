@@ -326,9 +326,8 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void signUp() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-
     try {
+      FirebaseAuth _auth = FirebaseAuth.instance;
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) {
@@ -345,6 +344,8 @@ class _SignUpPageState extends State<SignUpPage> {
           Navigator.pop(context);
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      loading = false;
+    }
   }
 }

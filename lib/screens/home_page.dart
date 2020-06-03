@@ -40,7 +40,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
                       return ItemSelectionPage(
-                        page: 'Single Player',
+                        page: 'SinglePlayer',
                       );
                     }));
                   },
@@ -66,7 +66,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
                       return ItemSelectionPage(
-                        page: 'Single Player',
+                        page: 'MultiPlayer',
                       );
                     }));
                   },

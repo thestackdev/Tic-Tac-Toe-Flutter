@@ -14,36 +14,33 @@ class _OnlineSelectionState extends State<OnlineSelection> {
   FirebaseAuth _auth;
   DatabaseReference _userData;
   bool loading = true;
-  String name;
+  String uID;
 
   checkForUser() async {
+    _auth = FirebaseAuth.instance;
+    _userData = FirebaseDatabase.instance.reference();
+
     await _auth.currentUser().then((value) {
-      if (value == null) {
+      if (value.uid == null) {
         Navigator.push(context, MaterialPageRoute(builder: (_) {
           return LoginPage();
         }));
       } else {
-        _userData = FirebaseDatabase.instance
-            .reference()
-            .child('Users')
-            .child(value.uid)
-            .child('name');
+        uID = value.uid;
+
+        setState(() {
+          loading = false;
+        });
+
+        // return true;
       }
-    });
-
-    await _userData.once().then((value) {
-      name = value.value;
-    });
-
-    setState(() {
-      loading = false;
     });
   }
 
   @override
   void initState() {
-    _auth = FirebaseAuth.instance;
     checkForUser();
+
     super.initState();
   }
 
@@ -68,18 +65,36 @@ class _OnlineSelectionState extends State<OnlineSelection> {
                 Positioned(
                   top: 70,
                   left: 20,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.orange[300],
-                        borderRadius: BorderRadius.circular(30)),
-                    child: Text(
-                      'Hello , $name',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                    ),
+                  child: StreamBuilder(
+                    stream: _userData
+                        .child('Users')
+                        .child(uID)
+                        .child('name')
+                        .onValue,
+                    builder:
+                        (BuildContext context, AsyncSnapshot<Event> snapshot) {
+                      print(snapshot.data);
+                      print(uID);
+                      if (snapshot.hasData) {
+                        DataSnapshot _snap = snapshot.data.snapshot;
+
+                        return Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: Colors.orange[300],
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Text(
+                            'Hello , $_snap.value',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      } else {
+                        return Text('');
+                      }
+                    },
                   ),
                 ),
                 Padding(

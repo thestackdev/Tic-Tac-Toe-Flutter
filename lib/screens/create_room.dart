@@ -1,11 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/models/buttons.dart';
-
+import 'package:share/share.dart';
 import 'online_gamePage.dart';
 
 class CreateRoom extends StatefulWidget {
+  final String uID;
+
+  const CreateRoom({Key key, this.uID}) : super(key: key);
   @override
   _CreateRoomState createState() => _CreateRoomState();
 }
@@ -16,38 +17,43 @@ class _CreateRoomState extends State<CreateRoom> {
   int selectedRound = 1;
   DatabaseReference _database;
   String pushID;
-  String userID;
   bool isWaiting = true;
-  Future<FirebaseUser> _user;
 
   getRef() {
-    _user = FirebaseAuth.instance.currentUser();
     _database = FirebaseDatabase.instance.reference();
   }
 
   createGameData() async {
-    await _user.then((value) {
-      userID = value.uid;
-    });
-
     DatabaseReference _gameRef = _database.child(pushID);
 
-    _gameRef.child(userID).set({'points': 0, 'turn': true, 'text': selected});
+    _gameRef
+        .child('players')
+        .child(widget.uID)
+        .set({'points': 0, 'text': selected});
 
-    _gameRef.child('rounds').set(selectedRound);
+    _gameRef.child('turn').set(widget.uID);
+
+    _gameRef.child('loading').set(false);
+
+    _gameRef.child('winner').set('null');
+
+    _gameRef
+        .child('rounds')
+        .set({'totalRounds': selectedRound, 'roundsCompleted': 1});
 
     _gameRef.child('tempData').set({
       'waiting': true,
       'text': selected,
     });
 
-    Buttons().getButtons().forEach((element) {
-      print(element);
+    for (int i = 0; i < 9; i++) {
       _gameRef
           .child('GameButtons')
-          .child(element.id.toString())
-          .set({'text': element.text, 'isEnabled': element.isEnabled});
-    });
+          .child(i.toString())
+          .set({'text': '', 'isEnabled': true});
+
+      _gameRef.child('availableButtons').child(i.toString()).set(true);
+    }
   }
 
   @override
@@ -186,17 +192,19 @@ class _CreateRoomState extends State<CreateRoom> {
                             ],
                           ),
                           SizedBox(
-                            height: 10,
+                            height: 30,
                           ),
                           GestureDetector(
                             onTap: () {
                               if (pushID == null) {
                                 setState(() {
                                   pushID = _database.push().key;
+                                  print(pushID);
                                 });
                                 createGameData();
                               }
                             },
+
                             child: Container(
                               padding: EdgeInsets.all(15),
                               decoration: BoxDecoration(
@@ -218,12 +226,29 @@ class _CreateRoomState extends State<CreateRoom> {
                               ? Container(
                                   padding: EdgeInsets.all(10),
                                   alignment: Alignment.center,
-                                  child: Text(
-                                    'Room ID : $pushID',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 19,
-                                        fontWeight: FontWeight.bold),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Text(
+                                        'Room ID : $pushID',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      FlatButton(
+                                        onPressed: () {
+                                          Share.share(pushID);
+                                        },
+                                        padding: EdgeInsets.all(0.0),
+                                        child: Text(
+                                          'Tap to Share',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
                                   ))
                               : Text(''),
                           SizedBox(
@@ -233,7 +258,7 @@ class _CreateRoomState extends State<CreateRoom> {
                               padding: EdgeInsets.symmetric(horizontal: 15),
                               alignment: Alignment.center,
                               child: Text(
-                                'Note : Please share this Room ID with your friends to Connect and Play',
+                                'Note : Please share this Room ID with your friends to Connect and Play , You\'ll Automatically Redirected to Game Page When Your Friend Starts The Game',
                                 style: TextStyle(
                                     color: Colors.limeAccent,
                                     fontSize: 19,
@@ -244,28 +269,29 @@ class _CreateRoomState extends State<CreateRoom> {
                     : Text(''),
               ],
             )),
-        StreamBuilder(
-          stream: _database.child(pushID).child('tempData').onValue,
-          builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
-            if (snapshot.hasData) {
-              DataSnapshot _snap = snapshot.data.snapshot;
-              if (_snap.value == null) {
-                setState(() {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (BuildContext context) {
-                    return OnlineGamePage(
-                      pushID: pushID,
-                    );
-                  }));
-                });
-              }
+        pushID != null
+            ? StreamBuilder(
+                stream: _database.child(pushID).child('tempData').onValue,
+                builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
+                  if (snapshot.hasData) {
+                    DataSnapshot _snap = snapshot.data.snapshot;
+                    if (_snap.value == null) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (BuildContext context) {
+                        return OnlineGamePage(
+                          pushID: pushID,
+                          uID: widget.uID,
+                        );
+                      }));
+                    }
 
-              return Text('');
-            } else {
-              return Text('');
-            }
-          },
-        )
+                    return Text('');
+                  } else {
+                    return Text('');
+                  }
+                },
+              )
+            : Text('')
       ],
     ));
   }

@@ -14,25 +14,26 @@ class _OnlineSelectionState extends State<OnlineSelection> {
   FirebaseAuth _auth;
   DatabaseReference _userData;
   bool loading = true;
+  String nameText = '';
   String uID;
 
   checkForUser() async {
     _auth = FirebaseAuth.instance;
-    _userData = FirebaseDatabase.instance.reference();
+    _userData = FirebaseDatabase.instance.reference().child('Users');
 
-    await _auth.currentUser().then((value) {
-      if (value.uid == null) {
+    _auth.currentUser().then((value) {
+      if (value == null) {
         Navigator.push(context, MaterialPageRoute(builder: (_) {
           return LoginPage();
         }));
       } else {
         uID = value.uid;
-
-        setState(() {
-          loading = false;
+        _userData.child(uID).child('name').once().then((value) {
+          setState(() {
+            nameText = value.value;
+            loading = false;
+          });
         });
-
-        // return true;
       }
     });
   }
@@ -65,36 +66,18 @@ class _OnlineSelectionState extends State<OnlineSelection> {
                 Positioned(
                   top: 70,
                   left: 20,
-                  child: StreamBuilder(
-                    stream: _userData
-                        .child('Users')
-                        .child(uID)
-                        .child('name')
-                        .onValue,
-                    builder:
-                        (BuildContext context, AsyncSnapshot<Event> snapshot) {
-                      print(snapshot.data);
-                      print(uID);
-                      if (snapshot.hasData) {
-                        DataSnapshot _snap = snapshot.data.snapshot;
-
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Colors.orange[300],
-                              borderRadius: BorderRadius.circular(30)),
-                          child: Text(
-                            'Hello , $_snap.value',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      } else {
-                        return Text('');
-                      }
-                    },
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Colors.orange[300],
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Text(
+                      'Hello $nameText',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
                 Padding(
@@ -117,7 +100,9 @@ class _OnlineSelectionState extends State<OnlineSelection> {
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (_) {
-                              return CreateRoom();
+                              return CreateRoom(
+                                uID: uID,
+                              );
                             }));
                           },
                           child: Container(
@@ -141,7 +126,7 @@ class _OnlineSelectionState extends State<OnlineSelection> {
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (_) {
-                              return JoinRoom();
+                              return JoinRoom(uID: uID,);
                             }));
                           },
                           child: Container(

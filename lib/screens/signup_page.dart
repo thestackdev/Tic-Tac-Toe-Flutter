@@ -225,9 +225,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 child: Center(
                                   child: FlatButton(
                                       onPressed: () {
-                                        setState(() {
-                                          loading = true;
-                                        });
+
                                         if (_formKey.currentState.validate()) {
                                           signUp();
                                         }
@@ -326,7 +324,10 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void signUp() async {
-    try {
+    setState(() {
+      loading = true;
+    });
+        try {
       FirebaseAuth _auth = FirebaseAuth.instance;
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)

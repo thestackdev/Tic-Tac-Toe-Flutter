@@ -1,23 +1,24 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/screens/online_gamePage.dart';
 
 class JoinRoom extends StatefulWidget {
+  final String uID;
+
+  const JoinRoom({Key key, this.uID}) : super(key: key);
+
   @override
   _JoinRoomState createState() => _JoinRoomState();
 }
 
 class _JoinRoomState extends State<JoinRoom> {
-  Future<FirebaseUser> _user;
   DatabaseReference _database;
   String inputData = '';
   String infoText = '';
-  String text;
   bool buttonEnabled = false;
+  String text;
 
   getRef() {
-    _user = FirebaseAuth.instance.currentUser();
     _database = FirebaseDatabase.instance.reference();
   }
 
@@ -113,29 +114,24 @@ class _JoinRoomState extends State<JoinRoom> {
                         (BuildContext context, AsyncSnapshot<Event> snapshot) {
                       if (snapshot.hasData) {
                         DataSnapshot _snap = snapshot.data.snapshot;
-                        if (_snap.value != null) {
-                          _database
-                              .child(inputData)
-                              .child('tempData')
-                              .remove()
-                              .then((value) => null);
-
-                          setState(() {
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (BuildContext context) {
-                              return OnlineGamePage(
-                                pushID: inputData,
-                              );
-                            }));
-                          });
-                        }
 
                         return GestureDetector(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (BuildContext context) {
-                              return OnlineGamePage();
-                            }));
+                            if (_snap.value != null) {
+                              _database
+                                  .child(inputData)
+                                  .child('tempData')
+                                  .remove();
+                              setState(() {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                                  return OnlineGamePage(
+                                    pushID: inputData,
+                                    uID: widget.uID,
+                                  );
+                                }));
+                              });
+                            }
                           },
                           child: Container(
                               alignment: Alignment.center,
@@ -184,12 +180,11 @@ class _JoinRoomState extends State<JoinRoom> {
             text = 'X';
           }
 
-          _user.then((value) {
-            _database
-                .child(inputData)
-                .child(value.uid)
-                .set({'points': 0, 'turn': false, 'text': text});
-          });
+          _database
+              .child(inputData)
+              .child('players')
+              .child(widget.uID)
+              .set({'points': 0, 'text': text});
 
           setState(() {
             buttonEnabled = true;

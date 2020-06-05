@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tic_tac_toe/screens/online_selection.dart';
 
 import 'signup_page.dart';
 
@@ -167,10 +168,6 @@ class _LoginPageState extends State<LoginPage> {
                                   child: FlatButton(
                                       onPressed: () {
                                         if (_formKey.currentState.validate()) {
-                                          setState(() {
-                                            loading = true;
-                                          });
-
                                           signIn();
                                         }
                                       },
@@ -260,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                  ),
+                    ),
                   )
                 ],
               ),
@@ -269,17 +266,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void signIn() async {
-    print(password);
+    FirebaseAuth _auth = FirebaseAuth.instance;
+
+    setState(() {
+      loading = true;
+    });
+
     try {
-      FirebaseAuth _auth = FirebaseAuth.instance;
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
-          .whenComplete(() {
-        setState(() {
-          loading = false;
-          Navigator.pop(context);
-        });
+          .then((value) => print(value.user.uid));
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return OnlineSelection();
+      }));
+    } catch (e) {
+      setState(() {
+        loading = false;
       });
-    } catch (e) {}
+      print(e.toString());
+
+    }
   }
 }

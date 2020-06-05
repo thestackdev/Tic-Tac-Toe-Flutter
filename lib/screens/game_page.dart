@@ -32,7 +32,6 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     initGame();
-    print('bot game');
     super.initState();
   }
 
@@ -74,7 +73,6 @@ class _GamePageState extends State<GamePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.all(9),
                       child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(children: <InlineSpan>[
@@ -132,10 +130,7 @@ class _GamePageState extends State<GamePage> {
                           child: Center(
                               child: Text(
                             gameButtons[index].text,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 45,
-                                fontWeight: FontWeight.bold),
+                            style: setTextStyle(45, Colors.white, 1.5),
                           )),
                         ),
                       );
@@ -247,11 +242,17 @@ class _GamePageState extends State<GamePage> {
         winner = user;
       }
     }
-    declareForWinner();
+
+    if (availabeButtons.length == 1 && winner == null) {
+      text = 'Draw Match';
+    }
+    if (roundsCompleted == widget.rounds) {
+      declareForWinner();
+    }
   }
 
   void declareForWinner() {
-    if (roundsCompleted == widget.rounds) {
+    if (winner != null) {
       if (botPoints > userPoints) {
         winner = bot;
         text = '$bot won the Game';
@@ -261,9 +262,19 @@ class _GamePageState extends State<GamePage> {
       } else {
         text = 'Draw Game';
       }
-
-      buttonText = 'Reset Game';
+    } else if (availabeButtons.length == 1) {
+      if (botPoints > userPoints) {
+        winner = bot;
+        text = '$bot won the Game';
+      } else if (botPoints < userPoints) {
+        winner = user;
+        text = '$user won the Game';
+      } else {
+        text = 'Draw Game';
+      }
     }
+
+    buttonText = 'Reset Game';
   }
 
   void initGame() {

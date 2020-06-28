@@ -50,9 +50,9 @@ class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
                     begin: Alignment.topRight,
                     end: Alignment.bottomRight,
                     colors: [
-                  Colors.orange[900],
-                  Colors.orange[700],
-                  Colors.orange[400],
+                  Colors.blue[400],
+                  Colors.blue[700],
+                  Colors.blue[900],
                 ])),
             child: Column(
               children: <Widget>[
@@ -62,18 +62,12 @@ class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white70,
-                            Colors.white60,
-                            Colors.white54
-                          ])),
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.lightBlue[200],
+                  ),
                   child: Text('Round  $roundsCompleted / ${widget.rounds}',
                       style: TextStyle(
-                          color: Colors.deepOrange,
+                          color: Colors.white,
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
                           height: 1.5)),
@@ -151,7 +145,7 @@ class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.orange[300],
+                            color: Colors.blue[300],
                           ),
                           child: Center(
                               child: Text(
@@ -206,12 +200,12 @@ class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(30),
                               topRight: Radius.circular(30))),
-                      padding: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(18),
                       alignment: Alignment.center,
                       child: Text(
                         btnText.toString(),
                         style: TextStyle(
-                            color: Colors.deepOrangeAccent,
+                            color: Colors.blue.shade300,
                             fontSize: 25,
                             fontWeight: FontWeight.bold),
                       ),

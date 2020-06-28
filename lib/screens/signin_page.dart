@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tic_tac_toe/screens/online_selection.dart';
 
+import 'online_selection.dart';
 import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -24,9 +27,9 @@ class _LoginPageState extends State<LoginPage> {
         width: double.infinity,
         decoration: BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-          Colors.orange[800],
-          Colors.orange[600],
-          Colors.orange[400],
+          Colors.blue[800],
+          Colors.blue[600],
+          Colors.blue[400],
         ])),
         child: loading
             ? Center(
@@ -68,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                                     boxShadow: [
                                       BoxShadow(
                                           color:
-                                              Color.fromRGBO(225, 95, 27, .3),
+                                              Color.fromRGBO(10, 10, 900, .3),
                                           blurRadius: 20,
                                           offset: Offset(0, 10))
                                     ]),
@@ -126,8 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                                               hintText: "Password",
                                               suffixIcon: IconButton(
                                                 icon: Icon(Icons.remove_red_eye,
-                                                    color: Colors
-                                                        .deepOrangeAccent),
+                                                    color: Colors.lightBlue),
                                                 onPressed: () {
                                                   setState(() {
                                                     if (hidePassword)
@@ -163,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                                 margin: EdgeInsets.symmetric(horizontal: 50),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
-                                    color: Colors.orange[700]),
+                                    color: Colors.blue[700]),
                                 child: Center(
                                   child: FlatButton(
                                       onPressed: () {
@@ -186,11 +188,10 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               FlatButton(
                                 onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SignUpPage()),
-                                  );
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SignUpPage()));
                                 },
                                 child: Text(
                                   "Don't have An Account? SignUp here!",
@@ -265,26 +266,24 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void signIn() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-
+  signIn() async {
     setState(() {
       loading = true;
     });
-
+    FirebaseAuth _auth = FirebaseAuth.instance;
     try {
-      await _auth
-          .signInWithEmailAndPassword(email: email, password: password)
-          .then((value) => print(value.user.uid));
-      Navigator.push(context, MaterialPageRoute(builder: (_) {
-        return OnlineSelection();
+      final result = await _auth.signInWithEmailAndPassword(
+          email: email.trim(), password: password.trim());
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      _pref.setString('UID', result.user.uid);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
+        return OnlineSelection(uid: result.user.uid);
       }));
     } catch (e) {
       setState(() {
         loading = false;
+        Fluttertoast.showToast(msg: e.toString());
       });
-      print(e.toString());
-
     }
   }
 }

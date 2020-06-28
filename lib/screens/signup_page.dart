@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'signin_page.dart';
+import 'online_selection.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -14,6 +16,8 @@ class _SignUpPageState extends State<SignUpPage> {
   bool hidePassword = true;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
+  DatabaseReference _databaseReference =
+      FirebaseDatabase.instance.reference().child('Users');
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +26,9 @@ class _SignUpPageState extends State<SignUpPage> {
         width: double.infinity,
         decoration: BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-          Colors.orange[800],
-          Colors.orange[600],
-          Colors.orange[400],
+          Colors.blue[800],
+          Colors.blue[600],
+          Colors.blue[400],
         ])),
         child: loading
             ? Center(
@@ -68,7 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     boxShadow: [
                                       BoxShadow(
                                           color:
-                                              Color.fromRGBO(225, 95, 27, .3),
+                                              Color.fromRGBO(10, 10, 900, .3),
                                           blurRadius: 20,
                                           offset: Offset(0, 10))
                                     ]),
@@ -121,7 +125,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                           },
                                           decoration: InputDecoration(
                                             hintText: "Email",
-                                            fillColor: Colors.deepOrange,
+                                            fillColor: Colors.lightBlue,
                                             hintStyle: TextStyle(
                                                 color: Colors.grey,
                                                 letterSpacing: 1.0),
@@ -152,8 +156,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                               suffixIcon: IconButton(
                                                 icon: Icon(
                                                   Icons.remove_red_eye,
-                                                  color:
-                                                      Colors.deepOrangeAccent,
+                                                  color: Colors.lightBlue,
                                                 ),
                                                 onPressed: () {
                                                   setState(() {
@@ -190,8 +193,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                               suffixIcon: IconButton(
                                                 icon: Icon(
                                                   Icons.remove_red_eye,
-                                                  color:
-                                                      Colors.deepOrangeAccent,
+                                                  color: Colors.lightBlue,
                                                 ),
                                                 onPressed: () {
                                                   setState(() {
@@ -221,11 +223,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                 margin: EdgeInsets.symmetric(horizontal: 50),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
-                                    color: Colors.orange[700]),
+                                    color: Colors.blue[700]),
                                 child: Center(
                                   child: FlatButton(
                                       onPressed: () {
-
                                         if (_formKey.currentState.validate()) {
                                           signUp();
                                         }
@@ -245,11 +246,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               FlatButton(
                                 onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()),
-                                  );
+                                  Navigator.pop(context);
                                 },
                                 child: Text(
                                   "Already have An Account? Login here!",
@@ -323,30 +320,31 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  void signUp() async {
+  signUp() async {
     setState(() {
       loading = true;
     });
-        try {
-      FirebaseAuth _auth = FirebaseAuth.instance;
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    try {
       await _auth
-          .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) {
-        DatabaseReference reference = FirebaseDatabase.instance
-            .reference()
-            .child('Users')
-            .child(value.user.uid);
-
-        reference.set({
+          .createUserWithEmailAndPassword(
+              email: email.trim(), password: password.trim())
+          .then((value) async {
+        _databaseReference.child(value.user.uid).set({
           'name': userName,
         });
-        setState(() {
-          loading = false;
-          Navigator.pop(context);
-        });
+        SharedPreferences _pref = await SharedPreferences.getInstance();
+        _pref.setString('UID', value.user.uid);
+        Navigator.pop(context);
+        Navigator.pop(context, MaterialPageRoute(builder: (_) {
+          return OnlineSelection(uid: value.user.uid);
+        }));
       });
     } catch (e) {
-      loading = false;
+      setState(() {
+        loading = false;
+        Fluttertoast.showToast(msg: e.toString());
+      });
     }
   }
 }

@@ -48,9 +48,9 @@ class _GamePageState extends State<GamePage> {
                     begin: Alignment.topRight,
                     end: Alignment.bottomRight,
                     colors: [
-                  Colors.orange[900],
-                  Colors.orange[700],
-                  Colors.orange[400],
+                  Colors.blue[400],
+                  Colors.blue[700],
+                  Colors.blue[900],
                 ])),
             child: Column(
               children: <Widget>[
@@ -61,7 +61,7 @@ class _GamePageState extends State<GamePage> {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    color: Colors.orangeAccent[200],
+                    color: Colors.lightBlue[200],
                   ),
                   child: Text('Round  $roundsCompleted / ${widget.rounds}',
                       style: setTextStyle(25, Colors.white, 1.5)),
@@ -125,7 +125,7 @@ class _GamePageState extends State<GamePage> {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.orange[300],
+                            color: Colors.blue[300],
                           ),
                           child: Center(
                               child: Text(
@@ -185,7 +185,7 @@ class _GamePageState extends State<GamePage> {
                       alignment: Alignment.center,
                       child: Text(
                         buttonText,
-                        style: setTextStyle(25, Colors.deepOrangeAccent, 1.5),
+                        style: setTextStyle(25, Colors.blue.shade300, 1.5),
                       ),
                     ),
                   ),

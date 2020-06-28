@@ -33,9 +33,9 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                     begin: Alignment.topRight,
                     end: Alignment.bottomRight,
                     colors: [
-                  Colors.orange[400],
-                  Colors.orange[700],
-                  Colors.orange[900],
+                  Colors.blue[400],
+                  Colors.blue[700],
+                  Colors.blue[900],
                 ])),
             child: Column(
               children: <Widget>[
@@ -68,7 +68,7 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                         child: Text(
                           'X',
                           style: TextStyle(
-                              color: Colors.orangeAccent,
+                              color: Colors.blue.shade300,
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),
@@ -87,7 +87,7 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                         child: Text(
                           'O',
                           style: TextStyle(
-                              color: Colors.orangeAccent,
+                              color: Colors.blue.shade300,
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),
@@ -125,11 +125,11 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                             width: 20,
                           ),
                           DropdownButton<int>(
+                              dropdownColor: Colors.blue.shade100,
                               iconEnabledColor: Colors.white,
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 25),
+                                  TextStyle(color: Colors.white, fontSize: 23),
                               iconSize: 30,
-                              dropdownColor: Colors.orange[300],
                               elevation: 0,
                               value: selectedRound,
                               onChanged: (int newValue) {
@@ -158,7 +158,6 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                 child: GestureDetector(
                   onTap: () {
                     if (widget.page == 'SinglePlayer') {
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -169,7 +168,6 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                         ),
                       );
                     } else {
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -193,7 +191,7 @@ class _ItemSelectionPageState extends State<ItemSelectionPage> {
                       child: Text(
                         'Start Game',
                         style: TextStyle(
-                            color: Colors.orangeAccent,
+                            color: Colors.blue.shade300,
                             fontSize: 18,
                             fontWeight: FontWeight.bold),
                       )),

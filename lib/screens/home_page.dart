@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tic_tac_toe/screens/item_selection.dart';
 import 'package:tic_tac_toe/screens/online_selection.dart';
+
+import 'signin_page.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: <Widget>[
-        Container(
+        body: Container(
             height: double.infinity,
             width: double.infinity,
             decoration: BoxDecoration(
@@ -16,9 +17,9 @@ class HomePage extends StatelessWidget {
                     begin: Alignment.topRight,
                     end: Alignment.bottomRight,
                     colors: [
-                  Colors.orange[400],
-                  Colors.orange[700],
-                  Colors.orange[900],
+                  Colors.blue[400],
+                  Colors.blue[700],
+                  Colors.blue[900],
                 ])),
             child: Column(
               children: <Widget>[
@@ -26,7 +27,7 @@ class HomePage extends StatelessWidget {
                   height: 100,
                 ),
                 Text(
-                  'Tic Tac Toe',
+                  'Tic Tac Toe ',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 36,
@@ -52,7 +53,7 @@ class HomePage extends StatelessWidget {
                     child: Text(
                       'Single Player',
                       style: TextStyle(
-                          color: Colors.orangeAccent,
+                          color: Colors.blue.shade300,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
@@ -78,7 +79,7 @@ class HomePage extends StatelessWidget {
                     child: Text(
                       'MultiPlayer',
                       style: TextStyle(
-                          color: Colors.orangeAccent,
+                          color: Colors.blue.shade300,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
@@ -88,11 +89,19 @@ class HomePage extends StatelessWidget {
                   height: 30,
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return OnlineSelection();
-                    }));
+                  onTap: () async {
+                    final pref = await SharedPreferences.getInstance();
+                    final uID = pref.getString('UID');
+                    if (uID == null) {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) {
+                        return LoginPage();
+                      }));
+                    } else {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return OnlineSelection(uid: uID);
+                      }));
+                    }
                   },
                   child: Container(
                     padding: EdgeInsets.all(15),
@@ -102,15 +111,13 @@ class HomePage extends StatelessWidget {
                     child: Text(
                       'Play Online',
                       style: TextStyle(
-                          color: Colors.orangeAccent,
+                          color: Colors.blue.shade300,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
               ],
-            )),
-      ],
-    ));
+            )));
   }
 }

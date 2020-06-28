@@ -13,52 +13,54 @@ class CreateRoom extends StatefulWidget {
 
 class _CreateRoomState extends State<CreateRoom> {
   String selected;
-  List<dynamic> roundsList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  List roundsList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   int selectedRound = 1;
-  DatabaseReference _database;
+  DatabaseReference _database = FirebaseDatabase.instance.reference();
   String pushID;
   bool isWaiting = true;
-
-  getRef() {
-    _database = FirebaseDatabase.instance.reference();
-  }
+  bool showStream = false;
 
   createGameData() async {
-    DatabaseReference _gameRef = _database.child(pushID);
+    setState(() {
+      pushID = _database.push().key;
+    });
+    _database = _database.child(pushID);
 
-    _gameRef
+    await _database
         .child('players')
         .child(widget.uID)
         .set({'points': 0, 'text': selected});
 
-    _gameRef.child('turn').set(widget.uID);
+    await _database.child('turn').set(widget.uID);
 
-    _gameRef.child('loading').set(false);
+    await _database.child('loading').set(false);
 
-    _gameRef.child('winner').set('null');
+    await _database.child('winner').set('null');
 
-    _gameRef
+    await _database
         .child('rounds')
         .set({'totalRounds': selectedRound, 'roundsCompleted': 1});
 
-    _gameRef.child('tempData').set({
+    await _database.child('tempData').set({
       'waiting': true,
       'text': selected,
     });
 
     for (int i = 0; i < 9; i++) {
-      _gameRef
+      await _database
           .child('GameButtons')
           .child(i.toString())
           .set({'text': '', 'isEnabled': true});
 
-      _gameRef.child('availableButtons').child(i.toString()).set(true);
+      await _database.child('availableButtons').child(i.toString()).set(true);
+      setState(() {
+        showStream = true;
+      });
     }
   }
 
   @override
   void initState() {
-    getRef();
     super.initState();
   }
 
@@ -75,9 +77,9 @@ class _CreateRoomState extends State<CreateRoom> {
                     begin: Alignment.topRight,
                     end: Alignment.bottomRight,
                     colors: [
-                  Colors.orange[400],
-                  Colors.orange[700],
-                  Colors.orange[900],
+                  Colors.blue[400],
+                  Colors.blue[700],
+                  Colors.blue[900],
                 ])),
             child: Column(
               children: <Widget>[
@@ -98,9 +100,13 @@ class _CreateRoomState extends State<CreateRoom> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     GestureDetector(
-                      onTap: () => setState(() {
-                        selected = 'X';
-                      }),
+                      onTap: () {
+                        if (pushID == null) {
+                          setState(() {
+                            selected = 'X';
+                          });
+                        }
+                      },
                       child: Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 30, vertical: 30),
@@ -110,16 +116,20 @@ class _CreateRoomState extends State<CreateRoom> {
                         child: Text(
                           'X',
                           style: TextStyle(
-                              color: Colors.orangeAccent,
+                              color: Colors.lightBlue,
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => setState(() {
-                        selected = 'O';
-                      }),
+                      onTap: () {
+                        if (pushID == null) {
+                          setState(() {
+                            selected = 'O';
+                          });
+                        }
+                      },
                       child: Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 30, vertical: 30),
@@ -129,7 +139,7 @@ class _CreateRoomState extends State<CreateRoom> {
                         child: Text(
                           'O',
                           style: TextStyle(
-                              color: Colors.orangeAccent,
+                              color: Colors.lightBlue,
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),
@@ -173,7 +183,7 @@ class _CreateRoomState extends State<CreateRoom> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 25),
                                   iconSize: 30,
-                                  dropdownColor: Colors.orange[300],
+                                  dropdownColor: Colors.blue[300],
                                   elevation: 0,
                                   value: selectedRound,
                                   onChanged: (int newValue) {
@@ -197,14 +207,9 @@ class _CreateRoomState extends State<CreateRoom> {
                           GestureDetector(
                             onTap: () {
                               if (pushID == null) {
-                                setState(() {
-                                  pushID = _database.push().key;
-                                  print(pushID);
-                                });
                                 createGameData();
                               }
                             },
-
                             child: Container(
                               padding: EdgeInsets.all(15),
                               decoration: BoxDecoration(
@@ -213,7 +218,7 @@ class _CreateRoomState extends State<CreateRoom> {
                               child: Text(
                                 'Create Room',
                                 style: TextStyle(
-                                    color: Colors.deepOrangeAccent,
+                                    color: Colors.lightBlue,
                                     fontSize: 19,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -269,22 +274,25 @@ class _CreateRoomState extends State<CreateRoom> {
                     : Text(''),
               ],
             )),
-        pushID != null
-            ? StreamBuilder(
+        showStream
+            ? StreamBuilder<Event>(
                 stream: _database.child(pushID).child('tempData').onValue,
-                builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
+                builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    DataSnapshot _snap = snapshot.data.snapshot;
-                    if (_snap.value == null) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (BuildContext context) {
-                        return OnlineGamePage(
-                          pushID: pushID,
-                          uID: widget.uID,
-                        );
-                      }));
+                    if (snapshot.data == null) {
+                      return RaisedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                              return OnlineGamePage(
+                                pushID: pushID,
+                                uID: widget.uID,
+                              );
+                            }));
+                          },
+                          child: Text('Start Game'));
                     }
-
                     return Text('');
                   } else {
                     return Text('');

@@ -1,9 +1,8 @@
 class Buttons {
-  final id;
+  int id;
   String text;
-  bool isEnabled;
 
-  Buttons({this.id, this.text = '', this.isEnabled = true});
+  Buttons({this.id, this.text = ''});
 
   List<Buttons> getButtons() {
     var gameButtons = <Buttons>[

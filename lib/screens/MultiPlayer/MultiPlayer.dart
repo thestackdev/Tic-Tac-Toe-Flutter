@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/logics/winner.dart';
 import 'package:tic_tac_toe/models/buttons.dart';
 
-class OfflineMultiPlayer extends StatefulWidget {
+class MultiPlayer extends StatefulWidget {
   final String selectedItem;
   final int rounds;
 
-  const OfflineMultiPlayer({Key key, this.selectedItem, this.rounds})
+  const MultiPlayer({Key key, this.selectedItem, this.rounds})
       : super(key: key);
 
   @override
-  _OfflineMultiPlayerState createState() => _OfflineMultiPlayerState();
+  _MultiPlayerState createState() => _MultiPlayerState();
 }
 
-class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
+class _MultiPlayerState extends State<MultiPlayer> {
   List<Buttons> gameButtons = [];
 
   List<int> playerX = [];
@@ -39,7 +38,7 @@ class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    /* return Scaffold(
       body: Stack(
         children: <Widget>[
           Container(
@@ -296,5 +295,6 @@ class _OfflineMultiPlayerState extends State<OfflineMultiPlayer> {
     turn = widget.selectedItem;
     winner = null;
     text = '';
+  } */
   }
 }

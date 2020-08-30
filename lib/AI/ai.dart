@@ -203,6 +203,6 @@ class AiTricks {
 
     return available[Random().nextInt(available.length)];
   }
-
-  
 }
+
+class MiniMax {}
